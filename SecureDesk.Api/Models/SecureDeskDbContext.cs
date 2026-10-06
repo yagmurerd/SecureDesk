@@ -156,6 +156,7 @@ public partial class SecureDeskDbContext : DbContext
             entity.HasKey(e => e.Id).HasName("PK__Users__3214EC07DDD3817E");
 
             entity.Property(e => e.Email).HasMaxLength(100);
+            entity.HasIndex(e => e.Email).IsUnique();
             entity.Property(e => e.FirstName).HasMaxLength(50);
             entity.Property(e => e.LastName).HasMaxLength(50);
             entity.Property(e => e.PasswordHash).HasMaxLength(255);
