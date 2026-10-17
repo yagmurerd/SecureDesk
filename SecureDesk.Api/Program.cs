@@ -5,7 +5,7 @@ using Microsoft.OpenApi.Models;
 using SecureDesk.Api.Models;
 using SecureDesk.Api.Services;
 using System.Text;
-using SecureDesk.Api.Services;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -91,6 +91,47 @@ builder.Services
     });
 
 var app = builder.Build();
+
+
+if (app.Environment.IsDevelopment())
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var context = scope.ServiceProvider
+            .GetRequiredService<SecureDeskDbContext>();
+
+        var email = "admin.test@securedesk.local";
+
+        var existingUser = await context.Users
+            .FirstOrDefaultAsync(u => u.Email == email);
+
+        if (existingUser == null)
+        {
+            var adminRole = await context.Roles
+                .FirstOrDefaultAsync(r => r.Name == "Admin");
+
+            if (adminRole == null)
+            {
+                throw new InvalidOperationException(
+                    "Admin rolü veritabanýnda bulunamadý.");
+            }
+
+            var adminUser = new User
+            {
+                FirstName = "Test",
+                LastName = "Admin",
+                Email = email,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(
+                    "ChangeMe_Test_2026!"),
+                RoleId = adminRole.Id
+            };
+
+            context.Users.Add(adminUser);
+            await context.SaveChangesAsync();
+        }
+    }
+}
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

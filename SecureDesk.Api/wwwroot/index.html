@@ -15,7 +15,7 @@
     <div class="login-screen" id="loginScreen">
         <form class="login-card" id="loginForm">
             <div class="login-logo">S</div>
-
+            
             <p class="eyebrow">SECUREDESK · IT SUPPORT</p>
             <h1>Welcome back</h1>
             <p class="login-subtitle">
@@ -96,6 +96,11 @@
                         </div>
                         <span>⌄</span>
                     </div>
+
+                    <button id="logoutButton" class="secondary-button" type="button">
+                        Sign Out
+                    </button>
+
                 </div>
             </header>
 
@@ -107,6 +112,50 @@
                         <p class="subtitle">Monitor your support tickets and system activity.</p>
                     </div>
                     <button class="primary-button" id="createTicketButton">＋ Create New Ticket</button>
+
+
+                </div>
+
+                <div class="ticket-form-panel" id="ticketFormPanel" hidden>
+                    <h2>Create New Ticket</h2>
+                    <p class="subtitle">Describe your issue and submit a support request.</p>
+
+                    <<form id="ticketForm" class="ticket-form" method="post">
+                        <label for="ticketTitle">Ticket Title</label>
+                        <input type="text" id="ticketTitle" name="title"
+                               placeholder="e.g. VPN connection problem"
+                               maxlength="150" required>
+
+                        <label for="ticketDescription">Description</label>
+                        <textarea id="ticketDescription" name="description"
+                                  placeholder="Explain the issue in detail..."
+                                  rows="5" required></textarea>
+
+                        <label for="ticketCategory">Category</label>
+                        <select id="ticketCategory" name="categoryId" required>
+                            <option value="">Select a category</option>
+                            <option value="1">Hardware</option>
+                            <option value="2">Software</option>
+                            <option value="3">Network</option>
+                            <option value="4">Access</option>
+                        </select>
+
+                        <label for="ticketPriority">Priority</label>
+                        <select id="ticketPriority" name="priorityId" required>
+                            <option value="">Select a priority</option>
+                            <option value="1">Low</option>
+                            <option value="2">Medium</option>
+                            <option value="3">High</option>
+                            <option value="4">Critical</option>
+                        </select>
+
+                        <p id="ticketFormMessage" role="alert"></p>
+
+                        <button type="submit" class="primary-button">Submit Ticket</button>
+                        <button type="button" id="cancelTicketButton" class="secondary-button">
+                            Cancel
+                        </button>
+                    </form>
                 </div>
 
                 <div class="stats-grid">
@@ -191,6 +240,111 @@
                         </table>
                     </div>
                 </section>
+
+
+                <section class="ticket-detail-panel" id="ticketDetailPanel" hidden>
+                    <div class="ticket-detail-header">
+                        <div>
+                            <p class="eyebrow">TICKET DETAILS</p>
+                            <h2 id="detailTicketTitle">Ticket Details</h2>
+                            <p id="detailTicketNumber" class="subtitle"></p>
+                        </div>
+                        <button type="button" class="secondary-button" id="closeTicketDetail">
+                            ← Back to tickets
+                        </button>
+                    </div>
+
+                    <div class="ticket-detail-grid">
+                        <div class="detail-item">
+                            <span>Status</span>
+                            <strong id="detailTicketStatus">—</strong>
+                        </div>
+                        <div class="detail-item">
+                            <span>Priority</span>
+                            <strong id="detailTicketPriority">—</strong>
+                        </div>
+                        <div class="detail-item">
+                            <span>Category</span>
+                            <strong id="detailTicketCategory">—</strong>
+                        </div>
+                        <div class="detail-item">
+                            <span>Created</span>
+                            <strong id="detailTicketCreated">—</strong>
+                        </div>
+                    </div>
+
+                    <div class="detail-description">
+                        <h3>Description</h3>
+                        <p id="detailTicketDescription">Loading ticket details...</p>
+                    </div>
+
+
+                    <div id="ticketManagementControls" class="ticket-management-controls" hidden>
+                        <h3>Ticket Management</h3>
+
+                        <div class="management-field">
+                            <label for="ticketStatusSelect">Change Status</label>
+                            <select id="ticketStatusSelect">
+                                <option value="">Loading statuses...</option>
+                            </select>
+                            <button type="button" id="updateTicketStatusButton">
+                                Update Status
+                            </button>
+                        </div>
+
+                        <div class="management-field">
+                            <label for="ticketAssigneeSelect">Assign To</label>
+                            <select id="ticketAssigneeSelect">
+                                <option value="">Select IT Staff or Admin</option>
+                            </select>
+                            <button type="button" id="assignTicketButton">
+                                Assign Ticket
+                            </button>
+                        </div>
+
+                        <p id="ticketManagementMessage" role="status"></p>
+                    </div>
+
+
+                    <div class="comments-section">
+
+                        <section class="history-section">
+                            <div class="history-heading">
+                                <h3>Activity History</h3>
+                                <button type="button" id="refreshHistoryButton">
+                                    Refresh
+                                </button>
+                            </div>
+
+                            <div id="ticketHistoryList" class="history-list">
+                                <p class="history-empty">Open a ticket to view its history.</p>
+                            </div>
+                        </section>
+
+                        <h3>Comments</h3>
+
+                        <div id="commentsList" class="comments-list">
+                            <p class="comments-empty">Loading comments...</p>
+                        </div>
+
+                        <form id="commentForm" class="comment-form">
+                            <textarea id="commentInput"
+                                      placeholder="Write a comment..."
+                                      rows="3"
+                                      maxlength="2000"
+                                      required></textarea>
+
+                            <button type="submit" id="sendCommentButton">
+                                Send Comment
+                            </button>
+
+                            <p id="commentMessage" role="status"></p>
+                        </form>
+                    </div>
+
+
+                </section>
+
 
                 <footer>© 2026 SecureDesk <span>IT Support & Asset Management</span></footer>
             </section>

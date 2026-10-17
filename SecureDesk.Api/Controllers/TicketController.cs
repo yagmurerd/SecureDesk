@@ -8,7 +8,7 @@ using System.Security.Claims;
 
 namespace SecureDesk.Api.Controllers
 {
-    [Authorize]
+    
     [ApiController]
     [Authorize]
     [Route("api/[controller]")]
@@ -34,13 +34,16 @@ namespace SecureDesk.Api.Controllers
                 return Unauthorized("Kullanıcı kimliği doğrulanamadı.");
 
             }
-            
-
-
-
 
 
             var role = User.FindFirst(ClaimTypes.Role)?.Value;
+
+            if (role != "Employee" &&
+                role != "IT Staff" &&
+                role != "Admin")
+            {
+                return Forbid();
+            }
 
             var query = _context.Tickets.AsQueryable();
 
@@ -49,6 +52,7 @@ namespace SecureDesk.Api.Controllers
             {
                 query = query.Where(t => t.UserId == userId);
             }
+
             // Admin ve IT Staff şimdilik tüm ticket'ları görebilir.
 
             var tickets = await query
@@ -87,6 +91,51 @@ namespace SecureDesk.Api.Controllers
 
 
         [Authorize]
+
+        [HttpGet("categories")]
+        public async Task<IActionResult> GetCategories()
+        {
+            var categories = await _context.TicketCategories
+                .Select(c => new
+                {
+                    c.Id,
+                    c.Name
+                })
+                .ToListAsync();
+
+            return Ok(categories);
+        }
+
+        [HttpGet("priorities")]
+        public async Task<IActionResult> GetPriorities()
+        {
+            var priorities = await _context.TicketPriorities
+                .Select(p => new
+                {
+                    p.Id,
+                    p.Name
+                })
+                .ToListAsync();
+
+            return Ok(priorities);
+        }
+
+        
+ [HttpGet("statuses")]
+[Authorize(Roles = "IT Staff,Admin")]
+public async Task<IActionResult> GetStatuses()
+{
+    var statuses = await _context.TicketStatuses
+        .Select(s => new
+        {
+            s.Id,
+            s.Name
+        })
+        .ToListAsync();
+
+    return Ok(statuses);
+}
+      
 
 
 
@@ -210,8 +259,12 @@ namespace SecureDesk.Api.Controllers
         [HttpPut("{id}/assign")]
         public async Task<IActionResult> AssignTicket(int id, AssignTicketDto dto)
         {
-            var currentUserId = int.Parse(
-    User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
+            var userIdValue = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!int.TryParse(userIdValue, out var currentUserId))
+            {
+                return Unauthorized("Kullanıcı kimliği doğrulanamadı.");
+            }
 
             var ticket = await _context.Tickets.FindAsync(id);
 
