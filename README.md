@@ -101,7 +101,7 @@ Relationships between users, tickets, and related records support ticket assignm
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yagmurer d/SecureDesk.git
+   git clone https://github.com/yagmurerd/SecureDesk.git
    ```
 
    Replace the repository URL with the exact URL of your GitHub repository if it differs.
