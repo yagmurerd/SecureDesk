@@ -395,9 +395,44 @@ const logoutButton = document.getElementById("logoutButton");
 
 logoutButton.addEventListener("click", () => {
     localStorage.removeItem("secureDeskToken");
+    localStorage.removeItem("secureDeskUser");
     loginScreen.classList.remove("hidden");
     loginMessage.textContent = "";
 });
+
+
+
+function updateProfile() {
+    const userData = localStorage.getItem("secureDeskUser");
+
+    if (!userData) return;
+
+    try {
+        const user = JSON.parse(userData);
+
+        document.getElementById("profileName").textContent =
+            `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim()
+            || "SecureDesk User";
+
+        const roleNames = {
+            Admin: "Administrator",
+            "IT Staff": "IT Support",
+            Employee: "Employee"
+        };
+
+        document.getElementById("profileRole").textContent =
+            roleNames[user.role] ?? user.role ?? "User";
+
+        const avatar = document.querySelector(".avatar");
+        if (avatar) {
+            avatar.textContent =
+                (user.firstName?.charAt(0) || "U").toUpperCase();
+        }
+    } catch (error) {
+        console.error("Profile loading error:", error);
+    }
+}
+
 
 
 function updateLoginScreen() {
@@ -406,6 +441,7 @@ function updateLoginScreen() {
     loginScreen.classList.toggle("hidden", Boolean(token));
 
     if (token) {
+        updateProfile();
         loadTickets();
     }
 }
@@ -463,7 +499,43 @@ loginForm.addEventListener("submit", async (event) => {
 
         localStorage.setItem("secureDeskToken", token);
 
+        localStorage.setItem(
+            "secureDeskUser",
+            JSON.stringify({
+                firstName: data.firstName ?? data.FirstName,
+                lastName: data.lastName ?? data.LastName,
+                role: data.role ?? data.Role
+            })
+        );
+
+
         loginForm.reset();
+
+
+        //function updateProfile() {
+        //    const userData = localStorage.getItem("secureDeskUser");
+
+        //    if (!userData) return;
+
+        //    try {
+        //        const user = JSON.parse(userData);
+
+        //        document.getElementById("profileName").textContent =
+        //            `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim()
+        //            || "SecureDesk User";
+
+        //        const roleNames = {
+        //            Admin: "Administrator",
+        //            "IT Staff": "IT Support",
+        //            Employee: "Employee"
+        //        };
+
+        //        document.getElementById("profileRole").textContent =
+        //            roleNames[user.role] ?? user.role ?? "User";
+        //    } catch (error) {
+        //        console.error("Profile loading error:", error);
+        //    }
+        //}
 
         updateLoginScreen();
 
@@ -480,6 +552,33 @@ loginForm.addEventListener("submit", async (event) => {
         submitButton.textContent = "Sign in →";
     }
 });
+
+
+function getUserFromToken(token) {
+    try {
+        const payload = token.split(".")[1];
+        const base64 = payload
+            .replace(/-/g, "+")
+            .replace(/_/g, "/");
+
+        return JSON.parse(
+            decodeURIComponent(
+                atob(base64)
+                    .split("")
+                    .map(char =>
+                        "%" + char.charCodeAt(0)
+                            .toString(16)
+                            .padStart(2, "0")
+                    )
+                    .join("")
+            )
+        );
+    } catch (error) {
+        console.error("Token okunamadı:", error);
+        return null;
+    }
+}
+
 
 
 // Start application
